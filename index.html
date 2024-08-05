@@ -12,7 +12,7 @@
       justify-content: center;
       align-items: stretch;
       user-select: none;
-      padding: 20px;
+      padding: 10px;
     }
 
     .card {
@@ -51,7 +51,7 @@
       background-color: transparent;
       color: orangered;
       border: none;
-      font-size: 20px;
+      font-size: 18px;
       padding: 1px;
       cursor: pointer;
       transition: transform 0.3s ease;
@@ -107,7 +107,7 @@
 <div id="box"></div>
 <div class="info">
   <p>作者: <a href="http://www.leelei.info">leelei</a></p>
-  <p>用法: 鼠标【点击】直接出牌，或者【点击滑动】出牌，右键单击某张牌可以增加牌数(用于防止点错)</p>
+  <p>用法: 【点击】箭头增减牌，刷新网页重置</p>
 </div>
 <script>
   const arr = ['👑', '⚔', '2', 'A', 'K', 'Q', 'J'];
@@ -193,5 +193,11 @@
   window.onload = function () {
     initCards();
   }
+
+  document.addEventListener('dblclick', function(event){
+    event.preventDefault();
+  }, { passive: false });
 </script>
+</body>
+
 </html>
