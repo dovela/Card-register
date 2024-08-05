@@ -8,25 +8,27 @@
   <style>
     #box {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       align-items: stretch;
       user-select: none;
+      padding: 20px;
     }
 
     .card {
       position: relative;
       border-radius: 10px;
       width: 100px;
-      height: 160px; /* 增加高度以容纳按钮 */
+      height: 160px;
       background-color: #f5f5f5;
-      margin: 20px 12px 0; /* 增加上方和左右的间距，美化样式 */
+      margin: 5px; /* 适度减小间隔以适应屏幕 */
       box-shadow: 0 5px 5px 0 #c9c9c9;
       font-size: 28px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 10px; /* 适当调整底部内距 */
+      padding-bottom: 10px;
     }
 
     .card--empty {
@@ -42,14 +44,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 10px; /* 调整按钮容器的底部间距 */
+      margin-bottom: 10px;
     }
 
     .ctrl-btn {
       background-color: transparent;
       color: orangered;
       border: none;
-      font-size: 18px;
+      font-size: 20px;
       padding: 1px;
       cursor: pointer;
       transition: transform 0.3s ease;
@@ -68,7 +70,7 @@
     .card-count {
       font-size: 18px;
       color: orangered;
-      margin: 0 5px; /* 设置左右间距 */
+      margin: 0 5px;
     }
 
     .card--warning .card-count {
@@ -76,15 +78,27 @@
       font-weight: bold;
     }
 
-    #btn-box {
-      text-align: center;
-      margin-top: 30px;
+    @media (max-width: 600px) {
+      .card {
+        width: 30%; /* 动态调整宽度以适应屏幕 */
+        height: auto;
+        padding-bottom: 10px;
+      }
+
+      .ctrl-btn {
+        font-size: 20px; /* 调整按钮大小使之适合屏幕 */
+      }
+
+      .card-count {
+        font-size: 20px; /* 同样调整字号 */
+      }
     }
 
     .info {
       font-size: 14px;
-      margin-top: 70px;
+      text-align: center;
       color: #999;
+      margin-top: 20px; /* 调整间距以适应不同屏幕 */
     }
   </style>
 </head>
@@ -101,9 +115,6 @@
   const TYPE_CHOSEN = ' card--chosen';
   const TYPE_WARNING = ' card--warning';
   const TYPE_EMPTY = ' card--empty';
-
-  let chosenArr = [];
-  let history = [];
 
   function addClass(e, name) {
     if (e.className.indexOf(name) === -1) {
@@ -127,7 +138,6 @@
       let btnContainer = document.createElement('div');
       btnContainer.className = 'btn-container';
 
-      // 创建增加数量按钮
       let increaseBtn = document.createElement('button');
       increaseBtn.className = 'ctrl-btn';
       increaseBtn.innerHTML = '&#9650;';
@@ -141,7 +151,6 @@
       countDisplay.innerText = nums[i];
       countDisplay.setAttribute('count', nums[i]);
 
-      // 创建减少数量按钮
       let decreaseBtn = document.createElement('button');
       decreaseBtn.className = 'ctrl-btn';
       decreaseBtn.innerHTML = '&#9660;';
@@ -150,7 +159,6 @@
         changeCount(ele, -1);
       });
 
-      // 对调位置
       btnContainer.appendChild(increaseBtn);
       btnContainer.appendChild(countDisplay);
       btnContainer.appendChild(decreaseBtn);
@@ -160,87 +168,6 @@
       ele.setAttribute('count', nums[i]);
     }
     box.appendChild(frag);
-  }
-
-  function initSlideInput() {
-    let box = document.getElementById('box');
-    let cards = document.getElementsByClassName('card');
-
-    box.addEventListener('mousedown', installSlideInput);
-    box.addEventListener('mouseup', uninstallSlideInput);
-    box.addEventListener('mouseleave', uninstallSlideInput);
-
-    function installSlideInput() {
-      Array.from(cards).forEach((e) => {
-        e.addEventListener('mouseenter', slideSelect);
-        e.addEventListener('mouseleave', slideSelect);
-      });
-    }
-
-    function uninstallSlideInput() {
-      Array.from(cards).forEach((e) => {
-        e.removeEventListener('mouseenter', slideSelect);
-        e.removeEventListener('mouseleave', slideSelect);
-      });
-      submit();
-    }
-
-    Array.from(cards).forEach((e) => {
-      e.addEventListener('click', function (event) {
-        slideSelect(event);
-        submit();
-      });
-    });
-
-    function slideSelect(event) {
-      let idx = event.currentTarget.getAttribute('index');
-      if (event.currentTarget.className.indexOf(TYPE_CHOSEN) === -1) {
-        addClass(event.currentTarget, TYPE_CHOSEN);
-        chosenArr.push(idx);
-      }
-    }
-  }
-
-  function reset() {
-    chosenArr = [];
-    let cards = document.getElementsByClassName('card');
-    Array.from(cards).forEach((v) => {
-      removeClass(v, TYPE_CHOSEN);
-    });
-  }
-
-  function recordHistory() {
-    let currentState = [];
-    let cards = document.getElementsByClassName('card');
-    Array.from(cards).forEach((card) => {
-      currentState.push({
-        count: parseInt(card.querySelector('.card-count').innerText),
-        index: card.getAttribute('index'),
-        className: card.className
-      });
-    });
-    history.push(currentState);
-  }
-
-  function submit() {
-    if (chosenArr.length > 0) {
-      recordHistory();
-    }
-    let cards = document.getElementsByClassName('card');
-    chosenArr.forEach((v) => {
-      let card = cards[v];
-      let countDisplay = card.querySelector('.card-count');
-      let newCount = parseInt(countDisplay.innerText) - 1;
-      countDisplay.innerText = newCount;
-      card.setAttribute('count', newCount);
-      removeClass(card, TYPE_WARNING);
-      if (newCount < 1) {
-        countDisplay.innerText = 0;
-        card.setAttribute('count', 0);
-        addClass(card, TYPE_EMPTY);
-      }
-    });
-    reset();
   }
 
   function changeCount(card, delta) {
@@ -263,32 +190,8 @@
     }
   }
 
-  function addCardCount(e) {
-    if (e && e.querySelector && e.querySelector('.card-count')) {
-      let countDisplay = e.querySelector('.card-count');
-      let count = parseInt(countDisplay.innerText) + 1;
-      let index = e.getAttribute('index');
-      if (count <= nums[index]) {
-        countDisplay.innerText = count;
-        e.setAttribute('count', count);
-        if (count === nums[index]) {
-          addClass(e, TYPE_WARNING);
-        } else if (count > 0) {
-          removeClass(e, TYPE_EMPTY);
-        }
-      }
-    }
-  }
-
   window.onload = function () {
-    document.oncontextmenu = function (event) {
-      event.preventDefault();
-      if (event.button === 2) {
-        addCardCount(event.target);
-      }
-    };
     initCards();
-    initSlideInput();
   }
 </script>
 </html>
